@@ -1,3 +1,9 @@
+### DEFINE STATES OF THE NODES
+ALREADY_VISITED = 1
+NOT_VISITED = 0
+CURRENTLY_VISITING = -1
+
+
 class GraphNode:
     def __init__(self, value : int):
         self.value = value
@@ -15,17 +21,17 @@ class GraphNode:
             self.add_neighbour(neighbour)
 
 
-def visit(node : GraphNode, is_visited):
+def visit(node : GraphNode, state):
 
-    print(is_visited)
+    print(state)
 
-    is_visited[node.value] = -1
+    state[node.value] = CURRENTLY_VISITING
 
     answer = False
 
     for neighbour_node in node.neighbours:
 
-        if is_visited[neighbour_node.value] == -1:
+        if state[neighbour_node.value] == CURRENTLY_VISITING:
 
             print(f'Found back edge from {node.value} -> {neighbour_node.value}')
 
@@ -33,12 +39,12 @@ def visit(node : GraphNode, is_visited):
 
             break
 
-        elif is_visited[neighbour_node.value] == 0:
+        elif state[neighbour_node.value] == NOT_VISITED:
             
-            answer = answer or visit(neighbour_node, is_visited)
+            answer = answer or visit(neighbour_node, state)
 
     
-    is_visited[node.value] = 1
+    state[node.value] = ALREADY_VISITED
 
     return answer
 
@@ -51,18 +57,19 @@ def visit(node : GraphNode, is_visited):
 
 def has_cycle(adjList):
 
-    is_visited = {}
+    state = {}
 
     for node in adjList:
-        is_visited[node.value] = 0
+        
+        state[node.value] = NOT_VISITED
 
     does_contain_cycle = False
     
     for node in adjList:
 
-        if not is_visited[node.value]:
+        if state[node.value] == NOT_VISITED:
 
-            does_contain_cycle = does_contain_cycle or visit(node, is_visited)
+            does_contain_cycle = does_contain_cycle or visit(node, state)
 
             
         
