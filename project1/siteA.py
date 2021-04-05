@@ -62,9 +62,9 @@ def main():
         found_deadlock_in_site = send_probe(parent_id, processes[site_proc_id])
 
         if found_deadlock_in_site:
-            print(f'Deadlock found in site B')
+            print(f'Deadlock found in site A')
         else:
-            print(f'Site B is deadlock free')
+            print(f'Site A is deadlock free')
 
 
 if __name__ == "__main__":
