@@ -1,3 +1,5 @@
+import socket
+
 class Process:
     def __init__(self, id):
         self.id = id
@@ -8,22 +10,43 @@ class Process:
         self.waits_for.append(process)
 
 
+class ExternalProcess:
+    def __init__(self, id, UDP_IP, UDP_Port):
+        self.id = id
+        self.UDP_IP = UDP_IP
+        self.UDP_Port = UDP_Port
 
-def recieve_probe(parent_id : int, imm_parent : Process, cur_process: Process) -> bool:
+
+
+
+def recieve_probe(parent_id : int, imm_parent : Process, cur_process) -> bool:
 
     print(f'Probe recieved by process P{cur_process.id}')
+
+    if(isinstance(cur_process, ExternalProcess)):
+        print(f'Process P{cur_process.id} is an external process')
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        probe_msg = str(parent_id) + '-' + str(imm_parent.id) + '-' + str(cur_process.id)
+        print(probe_msg)
+        client_socket.sendto(probe_msg.encode(), (cur_process.UDP_IP, cur_process.UDP_Port))
+        return False
+
     if(cur_process.id == parent_id):
         print(f'Deadlock found at process P{cur_process.id} from process P{imm_parent.id}')
-
         return True
 
+
+    
 
     return send_probe(parent_id, cur_process)
 
     
 
-def send_probe(parent_id : int, cur_process : Process) -> bool:
+def send_probe(parent_id : int, cur_process) -> bool:
     # found_deadlock = False
+    # check for externalProcess
+
     for neighbour in cur_process.waits_for:
         found_deadlock = recieve_probe(parent_id, cur_process, neighbour)
         if found_deadlock:
